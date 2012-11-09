@@ -6,7 +6,7 @@
  * @param function
  *            viewModel the POJO Knockout-JS style viewModel function that you
  *            would normally write. This object must already have
- *            ko.observable*s|computed's assigned to the desired propertiespropToConstraintMap -
+ *            ko.observable*s|computed's assigned to the desired properties.
  *
  *            In addition, the function must contain a publicly-accesible 
  *            property called 'constraintGroups'. The property must be a map of
@@ -50,7 +50,7 @@
  * // -------------------------------------------------------------------
  */
 var ValidatedViewModel = function(ViewModelFunc) {
-	// if user supplied a function instead, instantiate it.
+	
 	if ('function' !== typeof ViewModelFunc) {
 		throw new TypeError(
 				"the supplied viewModel must be of type function. '"
@@ -248,7 +248,7 @@ var ValidatedViewModel = function(ViewModelFunc) {
 
 	/**
 	 * Removes the named constraint group. Throws errors if constraint group
-	 * does not not exist, if the constraint group is not currently applied.
+	 * does not not exist, or if the constraint group is not currently applied.
 	 * 
 	 * @param constraintGroupName
 	 *            string constraint group name
@@ -717,7 +717,8 @@ var TestValidatedViewModel = function(config) {
 	a.push('not there');
 	a.push('you');
 	a.push('silly');
-	a.push('dog');	var someValid = {
+	a.push('dog');
+	var someValid = {
 			prop1 : 1,
 			prop2 : 1,
 			prop3 : 0
