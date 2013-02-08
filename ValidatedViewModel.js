@@ -228,13 +228,57 @@ var ValidatedViewModel = function(ViewModelFunc) {
 			throw new ReferenceError("Property '" + propertyName
 					+ "' does not exist");
 		}
+		
+		// CHANGE: jspradlin - 2013-02-06 -
+		// Altered behavior from core library. The params were not properly compared.
+		// This caused a bug where the validation rules were never cleared. 
+		// In ko.validation rules are added in the addExtender method. The params are transformed
+		// during this process. For example a required rule will automatically create a param = true.
+        // In order to do a valid comparison, the same object must be constructed using those rules
+        // in order compare with the 'params' stored in the constraint parameters 
+        
+        // Transform the parameters to the format they would be after the call to addExtender
+        var paramValues = constraintParameters; 
+        if(constraintParameters.message || constraintParameters.onlyIf){
+            paramsValues = (constraintParameters.params === undefined || 
+                          constraintParameters.params === null || 
+                          constraintParameters.params === "") ? 
+              true : 
+              constraintParameters.params; 
+        }
+        		
 		var found = false;
 		for ( var i = 0; i < rules.length; i++) {
-			if (rules[i].rule === constraintName
-					&& rules[i].params == constraintParameters) {
+		    
+		    var rule = rules[i]; 
+		    // Conver the string "true" to a proper boolean for comparison
+		    var ruleParams = rule.params === "true" ? true : rule.params;
+			
+			// Convert the string "false" to a proper boolean for comparison
+			ruleParams = ruleParams === "false" ? false: ruleParams; 
+		    
+            // The params for the pattern rule can be reqular expressions
+			// If the parameter is not already a string, convert it to one for
+			// proper comparison. Do this for the rule's parameter and the 
+			// constrainParam stored in the configuration group
+            if(constraintName === "pattern"){
+                if(ruleParams && typeof(ruleParams) != "string"){
+                    ruleParams = ruleParams.source;  
+                }
+                if(paramsValues && typeof(paramsValues) != "string"){
+                    paramsValues = paramsValues.source;
+                }
+            }
+            
+			// Check to see if this rule should be removed
+			if (rule.rule === constraintName && ruleParams == paramsValues){
 				found = true;
 				rules.splice(i, 1);
-				break;
+				i -=1; // reduce the index to make sure last entry is not skipped.
+				// Change: jspradlin - removed this break to allow removing of ALL matches for constraint name
+				// For some reason I was seeing multiple rules being added in knockout.validation's internal rules collection
+				
+				// break; 
 				// don't continue deleting any additional occurences of this
 				// constraint. Hence if applyConstraintGroups permitted multiple
 				// applications of constraint groups, N applications of the
