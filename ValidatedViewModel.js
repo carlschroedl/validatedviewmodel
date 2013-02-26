@@ -153,13 +153,14 @@ var ValidatedViewModel = function (ViewModelFunc) {
                     }
                     
                     var constraints = this.constraintGroups[name][propertyName];
+
                     for(var constraintName in constraints){
                         if(constraints.hasOwnProperty(constraintName)){
                             var constraintDefinition = constraints[constraintName];
                             
                             if('object' == typeof constraintDefinition){
                             
-                            //if messages, etc were specified, but
+                            //if the definition contains messages etc., but
                             //no parameter to the validator 
                             //was specified, insert true for params
                             //value. This is identical to ko.validation behavior
@@ -170,9 +171,11 @@ var ValidatedViewModel = function (ViewModelFunc) {
                             else{ //parameter was a primitive, make it an object
                                 constraintDefinition = {params: constraintDefinition};
                             }
-                        //now that the constraint is definitely an object in the 
+                        //now that the constraint definition is definitely an object in the
                         //proper format add key to the object
                         constraintDefinition.constraintGroupId = constraintGroupId;
+                        constraints[constraintName] = constraintDefinition;
+                        
                         }//end if
                     }//end foreach    
                     // add the constraints to the view model property
