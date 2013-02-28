@@ -176,18 +176,10 @@ var TestValidatedViewModel = function(config) {
 
 	var jabbaVM = new MyViewModel();
 	ko.validation.init();
-	ko
-			.applyBindings(
-					noErrorsVM,
-					document
-							.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
+	ko.applyBindings(noErrorsVM);
 	noErrorsVM.applyConstraintGroup('dummy');
 	
-	ko
-	.applyBindings(
-			noErrorsVMToo,
-			document
-					.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
+	ko.applyBindings(noErrorsVMToo);
 	noErrorsVMToo.applyConstraintGroup('dolly');
 	
 	noErrorsVMs = [noErrorsVM, noErrorsVMToo];
@@ -355,19 +347,11 @@ var TestValidatedViewModel = function(config) {
 	}
 	
 	
-	ko
-			.applyBindings(
-					erringVM,
-					document
-							.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
-		ko
-			.applyBindings(
-					erringVMToo,
-					document
-							.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
-		erringVMToo.applyConstraintGroup('jamesbond');
-		var errVMs = [erringVM, erringVMToo];
-		// set all to fail:
+	ko.applyBindings(erringVM);
+	ko.applyBindings(erringVMToo);
+    erringVMToo.applyConstraintGroup('jamesbond');
+	var errVMs = [erringVM, erringVMToo];
+	// set all to fail:
 
 	// (leave prop1 undefined to trigger 'required' error)
 
@@ -460,11 +444,7 @@ var TestValidatedViewModel = function(config) {
 
 	
 	//now test the aliased, derived vm:
-	ko
-			.applyBindings(
-					jabbaVM,
-					document
-							.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
+	ko.applyBindings(jabbaVM);
 	jabbaVM.applyConstraintGroup('jabba');
 	
 	
@@ -480,13 +460,7 @@ var TestValidatedViewModel = function(config) {
 	
 	//test a shifty model... his constraints keep appearing and disappearing.
 	var shifty =  new MyViewModel();
-	ko
-	.applyBindings(
-			shifty,
-			document
-					.getElementById(config.aDOMElementIDWithoutChildrenAndWithoutKOBindings));
-
-	
+	ko.applyBindings(shifty);
 	shifty.applyConstraintGroup('needy');
 	testForErrors(shifty, noValid);
 	shifty.removeConstraintGroup('needy');
@@ -546,6 +520,5 @@ var TestValidatedViewModel = function(config) {
 	console.log('</test>');
 };
 TestValidatedViewModel({
-	aDOMElementIDWithoutChildrenAndWithoutKOBindings : "submit",
 	printConfirmationWhenTestsPass : true
 });
