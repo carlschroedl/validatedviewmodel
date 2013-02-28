@@ -1,23 +1,10 @@
 /*
-// ///////////////////////////////////////////////////////////////////////////////////////////
 //
 // TO RUN UNIT TESTS:
+// > Include this script and ValidatedViewModel in a skeleton html document.
+// > Open your browser's console to examine output.
 // 
-// > include this script in your document.
-// > copy everything between '//<test>' and '//</test>' into a document ready
-// 		function
-// > set the parameterized config values appropriately
-//
-// ///////////////////////////////////////////////////////////////////////////////////////////
-
-// <test>
-TestValidatedViewModel({
-	aDOMElementIDWithoutChildrenAndWithoutKOBindings : "submit",
-	printConfirmationWhenTestsPass : true
-});
-// </test>
-//DO NOT COPY ANYTHING BELOW THIS LINE 
-//*/
+*/
 
 var TestValidatedViewModel = function(config) {
 	console.log('<test>');
@@ -558,3 +545,7 @@ var TestValidatedViewModel = function(config) {
 	console.log('PASSED ' + testsPassed + '/' + numberOfTests + ' TESTS.');
 	console.log('</test>');
 };
+TestValidatedViewModel({
+	aDOMElementIDWithoutChildrenAndWithoutKOBindings : "submit",
+	printConfirmationWhenTestsPass : true
+});
