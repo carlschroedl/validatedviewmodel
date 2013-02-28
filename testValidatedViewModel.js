@@ -102,8 +102,10 @@ var TestValidatedViewModel = function(config) {
 		
 		return allSame;
 	};
-	
-	
+	//wrapper for ko.applyBindings
+    var applyKoBindings = function(viewModel){
+        ko.applyBindings(viewModel, config.domElt);
+    }
 
 //</testing utils>
 	var MyViewModel = ValidatedViewModel(function() {
@@ -176,10 +178,10 @@ var TestValidatedViewModel = function(config) {
 
 	var jabbaVM = new MyViewModel();
 	ko.validation.init();
-	ko.applyBindings(noErrorsVM);
+	applyKoBindings(noErrorsVM);
 	noErrorsVM.applyConstraintGroup('dummy');
 	
-	ko.applyBindings(noErrorsVMToo);
+	applyKoBindings(noErrorsVMToo);
 	noErrorsVMToo.applyConstraintGroup('dolly');
 	
 	noErrorsVMs = [noErrorsVM, noErrorsVMToo];
@@ -347,8 +349,8 @@ var TestValidatedViewModel = function(config) {
 	}
 	
 	
-	ko.applyBindings(erringVM);
-	ko.applyBindings(erringVMToo);
+	applyKoBindings(erringVM);
+	applyKoBindings(erringVMToo);
     erringVMToo.applyConstraintGroup('jamesbond');
 	var errVMs = [erringVM, erringVMToo];
 	// set all to fail:
@@ -444,7 +446,7 @@ var TestValidatedViewModel = function(config) {
 
 	
 	//now test the aliased, derived vm:
-	ko.applyBindings(jabbaVM);
+	applyKoBindings(jabbaVM);
 	jabbaVM.applyConstraintGroup('jabba');
 	
 	
@@ -460,7 +462,7 @@ var TestValidatedViewModel = function(config) {
 	
 	//test a shifty model... his constraints keep appearing and disappearing.
 	var shifty =  new MyViewModel();
-	ko.applyBindings(shifty);
+	applyKoBindings(shifty);
 	shifty.applyConstraintGroup('needy');
 	testForErrors(shifty, noValid);
 	shifty.removeConstraintGroup('needy');
@@ -519,6 +521,17 @@ var TestValidatedViewModel = function(config) {
 	console.log('PASSED ' + testsPassed + '/' + numberOfTests + ' TESTS.');
 	console.log('</test>');
 };
+
+window.onload=function(){
+    //setup dummy element for applyBindings calls
+    //if no element is supplied, ko.validation throws errors
+    var body = document.getElementsByTagName('body')[0];
+    var p = document.createElement('p');
+    p.id = "testValidatedViewModel";
+    body.appendChild(p);
+
 TestValidatedViewModel({
+    domElt: p,
 	printConfirmationWhenTestsPass : true
 });
+};
