@@ -30,13 +30,13 @@
  * self.prop3 = ko.observableArray();
  * 
  * self.constraintGroups = { 
- * 		yourGroupNameHere : 
- * 			{
- * 				prop1 : {required: true},
- *	 			prop2 : {pattern: '^[a-z0-9].$'}, 
- *				prop3 : {minLength: 3, message:'insufficient length'}
- *			}
- * 	};
+ *      yourGroupNameHere : 
+ *          {
+ *              prop1 : {required: true},
+ *              prop2 : {pattern: '^[a-z0-9].$'}, 
+ *              prop3 : {minLength: 3, message:'insufficient length'}
+ *          }
+ *  };
  * 
  * });
  * // -------------------------------------------------------------------
@@ -49,249 +49,273 @@
  * //rest of validation code here
  * // -------------------------------------------------------------------
  */
-var ValidatedViewModel = function(ViewModelFunc) {
-	
-	if ('function' !== typeof ViewModelFunc) {
-		throw new TypeError(
-				"the supplied viewModel must be of type function. '"
-				+ typeof viewModel + "' given.");
-	}
+var ValidatedViewModel = function (ViewModelFunc) {
+
+    if ('function' !== typeof ViewModelFunc) {
+        throw new TypeError(
+            "the supplied viewModel must be of type function. '" + typeof viewModel + "' given.");
+    }
 
 
-		/**
-		 * @deprecated - this method was a safe way of updating the (property
-		 *             name -> constraint) map. This function now assumes that
-		 *             the developer will properly format self.constraintGroups
-		 * 
-		 * registers a map of property names to constraint specification
-		 * objects. Fails if a group of the same name has already been
-		 * registered, or if the given name is not a string.
-		 * 
-		 * @param string
-		 *            name for the constraint group
-		 * @param propToConstraintMap -
-		 *            a map of view model property names to objects containing
-		 *            their validation constraint specifications. The
-		 *            specification must be identical to that which would be
-		 *            passed as an argument to ko.observable().extend() for the
-		 *            Knockout-Validation plugin.
-		 * 
-		 * @url https://github.com/ericmbarnard/Knockout-Validation/wiki/Native-Rules
-		 * 
-		 * @returns void
-		 * @author  cschroedl@xes-inc.com
-		 */
-	/*
-	 * var addConstraintGroup = function(name, propToConstraintMap){
-	 * if("undefined" == typeof self.constraintGroups[name]){//if key is yet
-	 * unused if(name instanceof String || name.constructor === String){
-	 * self.constraintGroups[name] = propToConstraintMap; } else{ throw new
-	 * TypeError("'name' must be of type String." + typeof name +" given."); } }
-	 * else{ //key is already used throw new Error("a constraint group named '" +
-	 * name + "' already exists"); } };
-	 */
+    /**
+     * @deprecated - this method was a safe way of updating the (property
+     *             name -> constraint) map. This function now assumes that
+     *             the developer will properly format self.constraintGroups
+     * 
+     * registers a map of property names to constraint specification
+     * objects. Fails if a group of the same name has already been
+     * registered, or if the given name is not a string.
+     * 
+     * @param string
+     *            name for the constraint group
+     * @param propToConstraintMap -
+     *            a map of view model property names to objects containing
+     *            their validation constraint specifications. The
+     *            specification must be identical to that which would be
+     *            passed as an argument to ko.observable().extend() for the
+     *            Knockout-Validation plugin.
+     * 
+     * @url https://github.com/ericmbarnard/Knockout-Validation/wiki/Native-Rules
+     * 
+     * @returns void
+     * @author  cschroedl@xes-inc.com
+     */
+    /*
+     * var addConstraintGroup = function(name, propToConstraintMap){
+     * if("undefined" == typeof self.constraintGroups[name]){//if key is yet
+     * unused if(name instanceof String || name.constructor === String){
+     * self.constraintGroups[name] = propToConstraintMap; } else{ throw new
+     * TypeError("'name' must be of type String." + typeof name +" given."); } }
+     * else{ //key is already used throw new Error("a constraint group named '" +
+     * name + "' already exists"); } };
+     */
 
-	/**
-	 * Applies the specified validation constraint group to the view model. This
-	 * function may not be called in your viewModel's constructor. The
-	 * application of multiple constraint groups does not eliminate or overwrite
-	 * the constraint definitions of preiviously applied constraint groups.
-	 * 
-	 * @param name
-	 *            string - name of the view model
-	 * 
-	 * @param config
-	 *            Object - optional argument that is passed as the second
-	 *            argument to ko.validation.group();
-	 * @url https://github.com/ericmbarnard/Knockout-Validation/wiki/Configuration
-	 *      (see Option "grouping")
-	 * @returns void
-	 * @author  cschroedl@xes-inc.com
-	 */
+    /**
+     * Applies the specified validation constraint group to the view model. This
+     * function may not be called in your viewModel's constructor. The
+     * application of multiple constraint groups does not eliminate or overwrite
+     * the constraint definitions of preiviously applied constraint groups.
+     * 
+     * @param name
+     *            string - name of the view model
+     * 
+     * @param config
+     *            Object - optional argument that is passed as the second
+     *            argument to ko.validation.group();
+     * @url https://github.com/ericmbarnard/Knockout-Validation/wiki/Configuration
+     *      (see Option "grouping")
+     * @returns void
+     * @author  cschroedl@xes-inc.com
+     */
 
-	ViewModelFunc.prototype.applyConstraintGroup = function(name, config) {
+    ViewModelFunc.prototype.applyConstraintGroup = function (name, config) {
 
-		if (name instanceof String || name.constructor === String) {
-			if ("undefined" === typeof this.constraintGroups
-					|| 'object' != typeof this.constraintGroups) {
-				throw new Error(
-						"Validated View Models must define a this.constraintGroups object. No such object detected.");
-			}
+        if (name instanceof String || name.constructor === String) {
+            if ("undefined" === typeof this.constraintGroups || 'object' != typeof this.constraintGroups) {
+                throw new Error(
+                    "Validated View Models must define a this.constraintGroups object. No such object detected.");
+            }
 
 
-			if ("undefined" === typeof this.constraintGroups[name]) {// if key is
-				// yet
-				// registered
-				throw new Error(
-						"This view model has no registered constraint group named '"
-								+ name
-								+ "'. Correct the name or register a new constraint group in this.constraintGroups");
-			} else {
-				//initialize if necessary::
-				if('undefined' === typeof this.appliedConstraintGroups){
-					this.appliedConstraintGroups = new Array();
-				}
-				//check for previous application of group
-				if (-1 === this.appliedConstraintGroups.indexOf(name)) {
-					this.appliedConstraintGroups.push(name);
-				} else {
-					// if group has already been applied,
-					throw new Error("The Constraint Group '" + name
-							+ "' has already been applied to this model.");
-				}
-				for (propertyName in this.constraintGroups[name]) {
+            if ("undefined" === typeof this.constraintGroups[name]) { // if key is
+                // yet
+                // registered
+                throw new Error(
+                    "This view model has no registered constraint group named '" + name + "'. Correct the name or register a new constraint group in this.constraintGroups");
+            } else {
+                //initialize if necessary::
+                if ('undefined' === typeof this.appliedConstraintGroups) {
+                    this.appliedConstraintGroups = new Array();
+                }
+                //check for previous application of group
+                if (name in this.appliedConstraintGroups) {
+                    // if group has already been applied,
+                    throw new Error("The Constraint Group '" + name + "' has already been applied to this model.");
 
-					var prop = this[propertyName];
+                }
 
-					var constraints = this.constraintGroups[name][propertyName];
-					if ('undefined' == typeof prop) {
-						throw new Error("Property '" + propertyName
-								+ "' was not found in this view model");
-					}
+                var constraintGroupId = ko.validation.utils.newId();
+                this.appliedConstraintGroups[name] = constraintGroupId;
 
-					if (!(prop instanceof ko.subscribable.constructor)) {
-						// if this is not a ko.observable(Array) or a
-						// ko.computed
-						throw new TypeError(
-								"Property '"
-										+ propertyName
-										+ "' must be a ko.observable(Array) or a ko.computed to be validated.");
-					}
+                for (propertyName in this.constraintGroups[name]) {
 
-					// add the constraints to the view model property
-					prop.extend(constraints);
+                    var prop = this[propertyName];
 
-				}
-				;
-				this['errors'] = ko.validation.group(this, config);
-			}
+                    if ('undefined' == typeof prop) {
+                        throw new Error("Property '" + propertyName + "' was not found in this view model");
+                    }
 
-		} else {
-			throw new TypeError(
-					"a string must be used to specify a registered constraint");
-		}
-	};
-	
+                    if (!(prop instanceof ko.subscribable.constructor)) {
+                        // if this is not a ko.observable(Array) or a
+                        // ko.computed
+                        throw new TypeError(
+                            "Property '" + propertyName + "' must be a ko.observable(Array) or a ko.computed to be validated.");
+                    }
+                    
+                    var constraints = this.constraintGroups[name][propertyName];
 
-	
-	/**
-	 * Applies all of the specified constraint groups to the model in the same
-	 * order that they were specified.
-	 * 
-	 * @param groupNames 
-	 *            array of string constraint group names
-	 * @param config 
-	 * 		object - see applyConstraintGroup documentation
-	 * @author  cschroedl@xes-inc.com
-	 */
+                    for(var constraintName in constraints){
+                        if(constraints.hasOwnProperty(constraintName)){
+                            var constraintDefinition = constraints[constraintName];
+                            
+                            if('object' == typeof constraintDefinition){
+                            
+                            //if the definition contains messages etc., but
+                            //no parameter to the validator 
+                            //was specified, insert true for params
+                            //value. This is identical to ko.validation behavior
+                                if('undefined' === typeof constraintDefinition.params){
+                                    constraintDefinition.params = true;
+                                }
+                            }
+                            else{ //parameter was a primitive, make it an object
+                                constraintDefinition = {params: constraintDefinition};
+                            }
+                        //now that the constraint definition is definitely an object in the
+                        //proper format add key to the object
+                        constraintDefinition.constraintGroupId = constraintGroupId;
+                        constraints[constraintName] = constraintDefinition;
+                        
+                        }//end if
+                    }//end foreach    
+                    // add the constraints to the view model property
+                    prop.extend(constraints);
 
-	ViewModelFunc.prototype.applyConstraintGroups = function(groupNames, config) {
-		for ( var i = 0; i < groupNames.length; ++i) {
-			this.applyConstraintGroup(groupNames[i], config);
-		}
-	};
-	
-	
+                };
+                this['errors'] = ko.validation.group(this, config);
+            }
 
-	
-		/**
-		 * Removes the specified constraint from the specified property
-		 * 
-		 * @param constraintName
-		 *            string - the name of the constraint. Ex: "required",
-		 *            "max", etc.
-		 * 
-		 * @param constraintParameters
-		 *            mixed - the value of the parameter passed to the
-		 *            constraint. Ex: 'true' in {required: true}. '42' in {max:
-		 *            42}
-		 * 
-		 * @param propertyName
-		 *            string- the name of the property to remove the constraint
-		 *            from
-		 * 
-		 * @returns boolean - true if the constriant 'constraintName' was
-		 *          deleted from property 'propertyName'. false if the
-		 *          constraint was not found.
-		 * @author  cschroedl@xes-inc.com
-		 */
-	ViewModelFunc.prototype.removeConstraintFromProperty = function(
-			constraintName, constraintParameters, propertyName) {
-		if(this[propertyName] instanceof ko.subscribable.constructor){
-			var rules = this[propertyName].rules();	
-		}
-		else{
-			throw new Error("Property '" + propertyName + "' does not implement ko.subscribable");
-		}
-		
-		if ('undefined' === typeof rules) {
-			throw new ReferenceError("Property '" + propertyName
-					+ "' does not exist");
-		}
-		var found = false;
-		for ( var i = 0; i < rules.length; i++) {
-			if (rules[i].rule === constraintName
-					&& rules[i].params == constraintParameters) {
-				found = true;
-				rules.splice(i, 1);
-				break;
-				// don't continue deleting any additional occurences of this
-				// constraint. Hence if applyConstraintGroups permitted multiple
-				// applications of constraint groups, N applications of the
-				// same constraint group would require N calls to
-				// removeConstraintGroup
-			}
-		}
+        } else {
+            throw new TypeError(
+                "a string must be used to specify a registered constraint");
+        }
+    };
 
-		return found;
-	};
 
-	/**
-	 * Removes the named constraint group. Throws errors if constraint group
-	 * does not not exist, or if the constraint group is not currently applied.
-	 * 
-	 * @param constraintGroupName
-	 *            string constraint group name
-	 * @author cschroedl@xes-inc.com
-	 */
-	
-	ViewModelFunc.prototype.removeConstraintGroup = function(constraintGroupName){
-		//ensure constraintGroups are still defined
-		if('undefined' === typeof this.constraintGroups){
-			throw new ReferenceError('Cannot remove the constraint group- no constraint groups have been defined');
-		}
-		//create local alias 
-		var constraintGroup = this.constraintGroups[constraintGroupName];
-		//check for bad constraint group name
-		if('undefined' === typeof constraintGroup){
-			throw new ReferenceError("Constraint group '" + constraintGroupName + "' does not exist");
-		}
-		//now that we know the constraint group exists, check to see if it has been applied
-		
-		//after checking to see that the appliedConstraintGroups property exists:
-			if('undefined' === typeof this.appliedConstraintGroups){
-				//then no constraintGroups have been applied
-				throw new Error("Constraint group '" + constraintGroupName + "' is not currently applied.");
-			}
-		if(-1 === this.appliedConstraintGroups.indexOf(constraintGroupName)){
-			throw new Error("Constraint group '" + constraintGroupName + "' is not currently applied.");
-		}
 
-		for(propertyName in constraintGroup){
-			var constraintDefinitions = constraintGroup[propertyName];
-			for(ruleName in constraintDefinitions){
-				this.removeConstraintFromProperty(ruleName, constraintDefinitions[ruleName], propertyName);
-			}
-			//now force validation to occur again
-			//unfortunately, this inefficiently notifies all 
-			//subscribers instead of just the validation handlers
+    /**
+     * Applies all of the specified constraint groups to the model in the same
+     * order that they were specified.
+     * 
+     * @param groupNames 
+     *            array of string constraint group names
+     * @param config 
+     *      object - see applyConstraintGroup documentation
+     * @author  cschroedl@xes-inc.com
+     */
 
-			//@todo only trigger the subscribed validation handlers  
+    ViewModelFunc.prototype.applyConstraintGroups = function (groupNames, config) {
+        for (var i = 0; i < groupNames.length; ++i) {
+            this.applyConstraintGroup(groupNames[i], config);
+        }
+    };
 
-			this[propertyName].notifySubscribers(this[propertyName]());
-		}
-		ko.utils.arrayRemoveItem(this.appliedConstraintGroups, constraintGroupName);
-	};
-	// return the newly-equipped View Model "class"
-	return ViewModelFunc;
+
+
+
+    /**
+     * Removes the specified constraint from the specified property
+     * 
+     * @param constraintName
+     *            string - the name of the constraint. Ex: "required",
+     *            "max", etc.
+     * 
+     * @param constraintParameters
+     *            mixed - the value of the parameter passed to the
+     *            constraint. Ex: 'true' in {required: true}. '42' in {max:
+     *            42}
+     * 
+     * @param propertyName
+     *            string- the name of the property to remove the constraint
+     *            from
+     * 
+     * @returns boolean - true if the constriant 'constraintName' was
+     *          deleted from property 'propertyName'. false if the
+     *          constraint was not found.
+     * @author  cschroedl@xes-inc.com
+     */
+    ViewModelFunc.prototype.removeConstraintFromProperty = function (
+    constraintName, constraintParameters, propertyName) {
+        if (this[propertyName] instanceof ko.subscribable.constructor) {
+            var rules = this[propertyName].rules();
+        } else {
+            throw new Error("Property '" + propertyName + "' does not implement ko.subscribable");
+        }
+
+        if ('undefined' === typeof rules) {
+            throw new ReferenceError("Property '" + propertyName + "' does not exist");
+        }
+        var found = false;
+        for (var i = 0; i < rules.length; i++) {
+            if (rules[i].rule === constraintName && rules[i].params == constraintParameters) {
+                found = true;
+                rules.splice(i, 1);
+                break;
+                // don't continue deleting any additional occurences of this
+                // constraint. Hence if applyConstraintGroups permitted multiple
+                // applications of constraint groups, N applications of the
+                // same constraint group would require N calls to
+                // removeConstraintGroup
+            }
+        }
+
+        return found;
+    };
+
+    /**
+     * Removes the named constraint group. Throws errors if constraint group
+     * does not not exist, or if the constraint group is not currently applied.
+     * 
+     * @param constraintGroupName
+     *            string constraint group name
+     * @author cschroedl@xes-inc.com
+     */
+
+    ViewModelFunc.prototype.removeConstraintGroup = function (constraintGroupName) {
+        //ensure constraintGroups are still defined
+        if ('undefined' === typeof this.constraintGroups) {
+            throw new ReferenceError('Cannot remove the constraint group- no constraint groups have been defined');
+        }
+        //create local alias 
+        var constraintGroup = this.constraintGroups[constraintGroupName];
+        //check for bad constraint group name
+        if ('undefined' === typeof constraintGroup) {
+            throw new ReferenceError("Constraint group '" + constraintGroupName + "' does not exist");
+        }
+        //now that we know the constraint group exists, check to see if it has been applied
+
+        //after checking to see that the appliedConstraintGroups property exists:
+        if ('undefined' === typeof this.appliedConstraintGroups) {
+            //then no constraintGroups have been applied
+            throw new Error("Constraint group '" + constraintGroupName + "' is not currently applied.");
+        }
+        if (!(constraintGroupName in this.appliedConstraintGroups)) {
+            throw new Error("Constraint group '" + constraintGroupName + "' is not currently applied.");
+        }
+        var constraintGroupId = this.appliedConstraintGroups[constraintGroupName];
+
+        for (propertyName in constraintGroup) {
+            var rulesForProperty = this[propertyName].rules();
+
+            for (var i = 0; i < rulesForProperty.length; i++) {
+                if (rulesForProperty[i].constraintGroupId === constraintGroupId) {
+                    //delete
+                    rulesForProperty.splice(i, 1);
+                    //update counter to account for delete
+                    i--;
+                }
+            }
+
+            //now force validation to occur again
+            //unfortunately, this inefficiently notifies all 
+            //subscribers instead of just the validation handlers
+
+            //@todo only trigger the subscribed validation handlers  
+
+            this[propertyName].notifySubscribers(this[propertyName]());
+        }
+        delete this.appliedConstraintGroups[constraintGroupName];
+    };
+    // return the newly-equipped View Model "class"
+    return ViewModelFunc;
 };
