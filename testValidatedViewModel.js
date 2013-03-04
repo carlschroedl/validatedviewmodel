@@ -6,7 +6,7 @@
 // 
 */
 
-var TestValidatedViewModel = function(config) {
+var testValidatedViewModel = function(config) {
     console.log('<test>');
 
     // 
@@ -517,7 +517,49 @@ var TestValidatedViewModel = function(config) {
     testForErrors(shifty, {prop1: 0});
     
     shifty.applyConstraintGroup('myAwesomeGroupZ');
+   
+    /*
+     *find the errors induced by the particular constraints and contraint groups
+     *referenced in url:
+      https://github.com/carlschroedl/validatedviewmodel/issues/1
+     */
+    testName = "Test removal of constraint groups with a different kind of constraintGroup syntax";
+
+    var Bug1VVM = ValidatedViewModel(function(){
+        var self = this;
+        self.a = ko.observable("a");
+        self.b = ko.observable();
+        self.constraintGroups = {
+            basic : {
+                a : {
+                    required: true,
+                    message: 'This is required'
+                }
+            },
+            advanced : {
+                b : {
+                    required: {
+                        message: 'this is also required'
+                    },
+                    pattern: {
+                        message: 'Must match the pattern',
+                        params: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+                    }
+                }
+            }
+        };
+    });
     
+    var b1vvm = new Bug1VVM();
+    applyKoBindings(b1vvm);
+    b1vvm.applyConstraintGroups(['basic', 'advanced']);
+    b1vvm.removeConstraintGroup('advanced');
+    if( 0 !== b1vvm.errors().length){
+        testFailed(testName);
+    }
+    else{
+        testPassed(testName);
+    }
     console.log('PASSED ' + testsPassed + '/' + numberOfTests + ' TESTS.');
     console.log('</test>');
 };
@@ -527,10 +569,9 @@ window.onload=function(){
     //if no element is supplied, ko.validation throws errors
     var body = document.getElementsByTagName('body')[0];
     var p = document.createElement('p');
-    p.id = "testValidatedViewModel";
     body.appendChild(p);
 
-TestValidatedViewModel({
+testValidatedViewModel({
     domElt: p,
     printConfirmationWhenTestsPass : true
 });
