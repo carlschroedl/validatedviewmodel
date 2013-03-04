@@ -6,7 +6,7 @@
 // 
 */
 
-var TestValidatedViewModel = function(config) {
+var testValidatedViewModel = function(config) {
 	console.log('<test>');
 
 	// 
